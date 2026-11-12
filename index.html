@@ -1,0 +1,1150 @@
+black: '#121212',
+                            dark: '#1a1a1a',
+                            gray: '#2a2a2a',
+                            red: '#d92525',
+                            gold: '#d4af37',
+                            white: '#ffffff'
+                        }<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Cruzmaltino - Notícias, Jogos e Resultados do Vasco da Gama</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vasco: {
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Custom Vasco Stripe Accent */
+        .vasco-sash-bg {
+            background: linear-gradient(135deg, #121212 0%, #121212 42%, #ffffff 42%, #ffffff 48%, #121212 48%, #121212 100%);
+        }
+        .vasco-sash-accent {
+            position: relative;
+        }
+        .vasco-sash-accent::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+            background-color: #d92525;
+            border-radius: 4px;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d92525;
+        }
+    </style>
+</head>
+<body class="bg-vasco-black text-gray-100 font-sans min-h-screen flex flex-col selection:bg-vasco-red selection:text-white">
+
+    <!-- Top Bar / Ticker -->
+    <div class="bg-vasco-dark border-b border-gray-800 text-xs py-2 px-4">
+        <div class="max-w-7xl mx-mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-3 overflow-hidden">
+                <span class="bg-vasco-red text-white text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap">
+                    <i class="fa-solid fa-bolt mr-1"></i> Em Dia
+                </span>
+                <div id="news-ticker" class="truncate text-gray-300">
+                    São Januário lotado para o próximo confronto no Brasileirão! Garanta seu ingresso.
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 text-gray-400 whitespace-nowrap text-xs">
+                <span><i class="fa-solid fa-location-dot text-vasco-red mr-1"></i> São Januário, RJ</span>
+                <span id="current-date-display"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="sticky top-0 z-40 bg-vasco-black/95 backdrop-blur-md border-b border-gray-800 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo & Brand -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('noticias')">
+                    <!-- Cruz de Malta SVG SVG Icon -->
+                    <div class="w-12 h-12 bg-black rounded-lg border border-gray-700 flex items-center justify-center p-1.5 shadow-lg group hover:border-vasco-red transition">
+                        <svg viewBox="0 0 100 100" class="w-full h-full text-vasco-red fill-current transition transform group-hover:scale-105">
+                            <!-- SVG Cruz de Malta simplified -->
+                            <path d="M 40,10 L 50,35 L 60,10 L 90,40 L 65,50 L 90,60 L 60,90 L 50,65 L 40,90 L 10,60 L 35,50 L 10,40 Z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-black tracking-tight text-white uppercase flex items-center">
+                            PORTAL <span class="text-vasco-red ml-1.5">VASCO</span>
+                        </h1>
+                        <p class="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">O Sentimento Não Pode Parar</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav Tabs -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <button onclick="switchTab('noticias')" id="nav-noticias" class="nav-btn active text-sm font-semibold px-4 py-2 rounded-lg transition hover:bg-vasco-gray flex items-center gap-2 text-white bg-vasco-gray">
+                        <i class="fa-solid fa-newspaper text-vasco-red"></i> Notícias
+                    </button>
+                    <button onclick="switchTab('jogos')" id="nav-jogos" class="nav-btn text-sm font-semibold px-4 py-2 rounded-lg transition hover:bg-vasco-gray flex items-center gap-2 text-gray-300">
+                        <i class="fa-solid fa-calendar-days text-vasco-red"></i> Jogos & Resultados
+                    </button>
+                    <button onclick="switchTab('tabela')" id="nav-tabela" class="nav-btn text-sm font-semibold px-4 py-2 rounded-lg transition hover:bg-vasco-gray flex items-center gap-2 text-gray-300">
+                        <i class="fa-solid fa-list-ol text-vasco-red"></i> Tabela
+                    </button>
+                    <button onclick="switchTab('elenco')" id="nav-elenco" class="nav-btn text-sm font-semibold px-4 py-2 rounded-lg transition hover:bg-vasco-gray flex items-center gap-2 text-gray-300">
+                        <i class="fa-solid fa-users text-vasco-red"></i> Elenco
+                    </button>
+                </nav>
+
+                <!-- Search & Quick Actions -->
+                <div class="flex items-center space-x-3">
+                    <div class="relative hidden sm:block">
+                        <input type="text" id="search-input" onkeyup="filterNews()" placeholder="Buscar notícias..." class="bg-vasco-dark text-xs border border-gray-700 rounded-full py-2 pl-9 pr-4 text-white focus:outline-none focus:border-vasco-red w-44 md:w-56 transition">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                    </div>
+                    <button onclick="openLiveModal()" class="bg-vasco-red hover:bg-red-700 text-white font-bold text-xs px-3.5 py-2 rounded-full transition flex items-center gap-1.5 shadow-md shadow-red-900/30 animate-pulse">
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                        AO VIVO
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Mobile Bottom / Nav Menu Bar -->
+        <div class="md:hidden flex justify-around border-t border-gray-800 bg-vasco-dark py-2 px-1 text-xs">
+            <button onclick="switchTab('noticias')" id="mob-noticias" class="mob-btn flex flex-col items-center text-vasco-red font-bold">
+                <i class="fa-solid fa-newspaper text-base"></i>
+                <span class="text-[10px] mt-1">Notícias</span>
+            </button>
+            <button onclick="switchTab('jogos')" id="mob-jogos" class="mob-btn flex flex-col items-center text-gray-400">
+                <i class="fa-solid fa-calendar-days text-base"></i>
+                <span class="text-[10px] mt-1">Jogos</span>
+            </button>
+            <button onclick="switchTab('tabela')" id="mob-tabela" class="mob-btn flex flex-col items-center text-gray-400">
+                <i class="fa-solid fa-list-ol text-base"></i>
+                <span class="text-[10px] mt-1">Tabela</span>
+            </button>
+            <button onclick="switchTab('elenco')" id="mob-elenco" class="mob-btn flex flex-col items-center text-gray-400">
+                <i class="fa-solid fa-users text-base"></i>
+                <span class="text-[10px] mt-1">Elenco</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- ================= SECTION 1: NOTÍCIAS (DEFAULT TAB) ================= -->
+        <section id="section-noticias" class="tab-section space-y-8">
+
+            <!-- Hero Featured Article -->
+            <div id="hero-article-container" class="relative rounded-2xl overflow-hidden bg-vasco-dark border border-gray-800 shadow-2xl group cursor-pointer" onclick="openArticleModal(featuredArticle)">
+                <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[380px]">
+                    <div class="lg:col-span-7 relative overflow-hidden h-64 lg:h-auto">
+                        <img id="hero-img" src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80" alt="Vasco Match Stadium" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-vasco-dark via-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-vasco-dark"></div>
+                        <span class="absolute top-4 left-4 bg-vasco-red text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">Destaque da Colina</span>
+                    </div>
+                    <div class="lg:col-span-5 p-6 lg:p-8 flex flex-col justify-between bg-vasco-dark">
+                        <div>
+                            <div class="flex items-center gap-2 text-xs text-vasco-red font-semibold uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-circle text-[8px]"></i> <span id="hero-category">Brasileirão & Bastidores</span>
+                            </div>
+                            <h2 id="hero-title" class="text-2xl lg:text-3xl font-black text-white group-hover:text-vasco-red transition leading-tight mb-3">
+                                Vasco vence clássico no Caldeirão de São Januário com show da torcida
+                            </h2>
+                            <p id="hero-summary" class="text-gray-400 text-sm line-clamp-3 leading-relaxed mb-4">
+                                Com atuação convincente e estádio lotado, o Gigante da Colina dominou a partida do início ao fim e garantiu mais três pontos valiosos no campeonato.
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-800 text-xs text-gray-500">
+                            <span id="hero-date"><i class="fa-regular fa-clock mr-1"></i> Há 2 horas</span>
+                            <span class="text-vasco-red font-bold flex items-center gap-1 group-hover:translate-x-1 transition">
+                                Ler notícia completa <i class="fa-solid fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Filter Tags & Mobile Search -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-gray-800 pb-4">
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <button onclick="filterCategory('todos')" class="cat-btn active bg-vasco-red text-white text-xs font-bold px-4 py-2 rounded-full transition">Todos</button>
+                    <button onclick="filterCategory('jogos')" class="cat-btn bg-vasco-dark hover:bg-vasco-gray text-gray-300 text-xs font-semibold px-4 py-2 rounded-full transition border border-gray-800">Jogos</button>
+                    <button onclick="filterCategory('mercado')" class="cat-btn bg-vasco-dark hover:bg-vasco-gray text-gray-300 text-xs font-semibold px-4 py-2 rounded-full transition border border-gray-800">Mercado da Bola</button>
+                    <button onclick="filterCategory('base')" class="cat-btn bg-vasco-dark hover:bg-vasco-gray text-gray-300 text-xs font-semibold px-4 py-2 rounded-full transition border border-gray-800">Base Forte</button>
+                    <button onclick="filterCategory('clube')" class="cat-btn bg-vasco-dark hover:bg-vasco-gray text-gray-300 text-xs font-semibold px-4 py-2 rounded-full transition border border-gray-800">Institucional</button>
+                </div>
+                <div class="text-xs text-gray-400 self-end sm:self-auto">
+                    Exibindo <span id="news-count" class="font-bold text-white">0</span> notícias
+                </div>
+            </div>
+
+            <!-- Content Grid: News + Sidebar -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Main News Grid (8 cols) -->
+                <div class="lg:col-span-8 space-y-6">
+                    <div id="news-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Dynamic News Cards Inserted Here -->
+                    </div>
+                </div>
+
+                <!-- Sidebar (4 cols) -->
+                <div class="lg:col-span-4 space-y-6">
+                    
+                    <!-- Next Match Card Widget -->
+                    <div class="bg-vasco-dark border border-gray-800 rounded-2xl p-5 shadow-lg vasco-sash-accent">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xs font-black uppercase tracking-wider text-gray-300 flex items-center gap-2">
+                                <i class="fa-solid fa-flag text-vasco-red"></i> Próximo Confronto
+                            </h3>
+                            <span class="text-[10px] bg-vasco-red/20 text-vasco-red font-bold px-2 py-0.5 rounded">Brasileirão</span>
+                        </div>
+
+                        <div class="bg-vasco-black/60 rounded-xl p-4 border border-gray-800/80">
+                            <div class="flex justify-between items-center text-center">
+                                <!-- Vasco -->
+                                <div class="flex flex-col items-center w-1/3">
+                                    <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center p-2 border border-gray-700 shadow mb-1">
+                                        <svg viewBox="0 0 100 100" class="w-full h-full text-vasco-red fill-current">
+                                            <path d="M 40,10 L 50,35 L 60,10 L 90,40 L 65,50 L 90,60 L 60,90 L 50,65 L 40,90 L 10,60 L 35,50 L 10,40 Z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-extrabold text-xs text-white">VASCO</span>
+                                    <span class="text-[10px] text-gray-400">(CASA)</span>
+                                </div>
+
+                                <!-- VS / Time -->
+                                <div class="w-1/3 flex flex-col items-center">
+                                    <span class="text-xs font-black text-vasco-red uppercase">VS</span>
+                                    <span class="text-lg font-black text-white my-0.5">18:30</span>
+                                    <span class="text-[10px] text-gray-400">Sábado</span>
+                                </div>
+
+                                <!-- Opponent -->
+                                <div class="flex flex-col items-center w-1/3">
+                                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center p-2 border border-gray-700 shadow mb-1">
+                                        <i class="fa-solid fa-shield-halved text-gray-300 text-xl"></i>
+                                    </div>
+                                    <span class="font-extrabold text-xs text-white">SÃO PAULO</span>
+                                    <span class="text-[10px] text-gray-400">(FORA)</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-gray-800 text-[11px] text-gray-400 text-center flex justify-around">
+                                <span><i class="fa-solid fa-location-dot text-vasco-red mr-1"></i> São Januário</span>
+                                <span><i class="fa-solid fa-tv text-gray-400 mr-1"></i> Premiere / Globo</span>
+                            </div>
+                        </div>
+
+                        <button onclick="switchTab('jogos')" class="w-full mt-3 py-2 text-xs font-bold text-gray-300 hover:text-white bg-vasco-gray/50 hover:bg-vasco-gray rounded-lg transition text-center block">
+                            Ver Calendário Completo <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Mini League Table Widget -->
+                    <div class="bg-vasco-dark border border-gray-800 rounded-2xl p-5 shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xs font-black uppercase tracking-wider text-gray-300 flex items-center gap-2">
+                                <i class="fa-solid fa-ranking-star text-vasco-gold"></i> Classificação Rápida
+                            </h3>
+                            <span class="text-[10px] text-gray-400">Série A 2026</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left text-gray-300">
+                                <thead class="text-[10px] uppercase bg-vasco-black text-gray-400 border-b border-gray-800">
+                                    <tr>
+                                        <th class="py-2 px-2">Pos</th>
+                                        <th class="py-2 px-2">Clube</th>
+                                        <th class="py-2 px-2 text-center">P</th>
+                                        <th class="py-2 px-2 text-center">J</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-800/60" id="mini-table-body">
+                                    <!-- Dynamic rows added by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button onclick="switchTab('tabela')" class="w-full mt-3 py-2 text-xs font-bold text-gray-300 hover:text-white bg-vasco-gray/50 hover:bg-vasco-gray rounded-lg transition text-center block">
+                            Tabela Detalhada <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Fan Zone Chant Audio Box -->
+                    <div class="bg-gradient-to-br from-vasco-dark to-black border border-gray-800 rounded-2xl p-5 shadow-lg">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-white mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-music text-vasco-red"></i> Cânticos da Torcida
+                        </h3>
+                        <p class="text-xs text-gray-400 mb-3">"Camisas Negras" - A linda história do Vasco</p>
+                        <div class="bg-vasco-black/80 rounded-lg p-3 text-[11px] text-gray-300 font-serif italic border border-gray-800 mb-3 leading-relaxed">
+                            "Eu já lutei por negros e operários...<br>
+                            Te sigo desde pequenininho...<br>
+                            O Sentimento Não Pode Parar!"
+                        </div>
+                        <button onclick="playChantSound()" id="chant-btn" class="w-full py-2 bg-vasco-red hover:bg-red-700 text-white font-bold text-xs rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Ouvir Cântico da Colina
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ================= SECTION 2: JOGOS & RESULTADOS ================= -->
+        <section id="section-jogos" class="tab-section hidden space-y-6">
+            
+            <div class="bg-vasco-dark border border-gray-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-white flex items-center gap-2 uppercase">
+                            <i class="fa-solid fa-calendar-days text-vasco-red"></i> Calendário de Jogos & Resultados
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1">Acompanhe todos os compromissos do Cruzmaltino na temporada</p>
+                    </div>
+
+                    <!-- Match Filters -->
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterMatches('todos')" class="match-filter-btn active bg-vasco-red text-white text-xs font-bold px-4 py-2 rounded-lg transition">Todos</button>
+                        <button onclick="filterMatches('proximos')" class="match-filter-btn bg-vasco-gray text-gray-300 text-xs font-bold px-4 py-2 rounded-lg transition hover:bg-gray-700">Próximos Jogos</button>
+                        <button onclick="filterMatches('resultados')" class="match-filter-btn bg-vasco-gray text-gray-300 text-xs font-bold px-4 py-2 rounded-lg transition hover:bg-gray-700">Resultados</button>
+                    </div>
+                </div>
+
+                <!-- Matches List Grid -->
+                <div id="matches-container" class="mt-6 space-y-4">
+                    <!-- Dynamic Matches Rendered by JavaScript -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ================= SECTION 3: TABELA DE CLASSIFICAÇÃO ================= -->
+        <section id="section-tabela" class="tab-section hidden space-y-6">
+            
+            <div class="bg-vasco-dark border border-gray-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-white flex items-center gap-2 uppercase">
+                            <i class="fa-solid fa-list-ol text-vasco-red"></i> Tabela Brasileirão Série A
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1">Classificação atualizada do campeonato</p>
+                    </div>
+                    <div class="text-xs text-gray-400 bg-vasco-black px-3 py-1.5 rounded-lg border border-gray-800">
+                        <span class="text-vasco-red font-bold">●</span> Zona de Libertadores (1º ao 6º)
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-300">
+                        <thead class="text-xs uppercase bg-vasco-black text-gray-400 border-b border-gray-800">
+                            <tr>
+                                <th class="py-3 px-4">Posição</th>
+                                <th class="py-3 px-4">Clube</th>
+                                <th class="py-3 px-4 text-center">PTS</th>
+                                <th class="py-3 px-4 text-center">J</th>
+                                <th class="py-3 px-4 text-center">V</th>
+                                <th class="py-3 px-4 text-center">E</th>
+                                <th class="py-3 px-4 text-center">D</th>
+                                <th class="py-3 px-4 text-center">GP</th>
+                                <th class="py-3 px-4 text-center">GC</th>
+                                <th class="py-3 px-4 text-center">SG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="full-table-body" class="divide-y divide-gray-800">
+                            <!-- Full Table rows added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ================= SECTION 4: ELENCO ================= -->
+        <section id="section-elenco" class="tab-section hidden space-y-6">
+            <div class="bg-vasco-dark border border-gray-800 rounded-2xl p-6 shadow-xl">
+                <div class="border-b border-gray-800 pb-4 mb-6">
+                    <h2 class="text-2xl font-black text-white flex items-center gap-2 uppercase">
+                        <i class="fa-solid fa-users text-vasco-red"></i> Elenco Profissional Vasco da Gama
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1">Jogadores e comissão técnica do Cruzmaltino</p>
+                </div>
+
+                <!-- Squad Filters -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button onclick="filterSquad('todos')" class="squad-btn active bg-vasco-red text-white text-xs font-bold px-4 py-2 rounded-lg transition">Todos</button>
+                    <button onclick="filterSquad('goleiros')" class="squad-btn bg-vasco-gray text-gray-300 text-xs font-bold px-4 py-2 rounded-lg transition hover:bg-gray-700">Goleiros</button>
+                    <button onclick="filterSquad('defensores')" class="squad-btn bg-vasco-gray text-gray-300 text-xs font-bold px-4 py-2 rounded-lg transition hover:bg-gray-700">Defensores</button>
+                    <button onclick="filterSquad('meias')" class="squad-btn bg-vasco-gray text-gray-300 text-xs font-bold px-4 py-2 rounded-lg transition hover:bg-gray-700">Meio-Campistas</button>
+                    <button onclick="filterSquad('atacantes')" class="squad-btn bg-vasco-gray text-gray-300 text-xs font-bold px-4 py-2 rounded-lg transition hover:bg-gray-700">Atacantes</button>
+                </div>
+
+                <!-- Squad Grid -->
+                <div id="squad-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- Dynamic Squad Cards -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ARTICLE DETAIL MODAL -->
+    <div id="article-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-vasco-dark border border-gray-700 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <button onclick="closeArticleModal()" class="absolute top-4 right-4 bg-vasco-black/80 text-gray-300 hover:text-white rounded-full w-9 h-9 flex items-center justify-center border border-gray-700 z-10 transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div id="modal-content" class="p-6 md:p-8">
+                <!-- Modal content dynamically injected -->
+            </div>
+        </div>
+    </div>
+
+    <!-- LIVE MATCH MODAL SIMULATOR -->
+    <div id="live-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-vasco-dark border border-gray-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl relative">
+            <button onclick="closeLiveModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-4">
+                <span class="inline-flex items-center gap-1.5 bg-red-600/20 text-vasco-red font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+                    <span class="w-2 h-2 rounded-full bg-vasco-red animate-ping"></span> Tempo Real
+                </span>
+                <h3 class="text-xl font-black text-white">Central do Jogo Ao Vivo</h3>
+                <p class="text-xs text-gray-400">São Januário - Caldeirão lotado!</p>
+            </div>
+
+            <!-- Live Score Board -->
+            <div class="bg-vasco-black rounded-xl p-6 border border-gray-800 text-center mb-6">
+                <div class="flex justify-around items-center">
+                    <div class="flex flex-col items-center">
+                        <div class="w-14 h-14 bg-black rounded-full flex items-center justify-center p-2 border border-gray-700 mb-2">
+                            <svg viewBox="0 0 100 100" class="w-full h-full text-vasco-red fill-current">
+                                <path d="M 40,10 L 50,35 L 60,10 L 90,40 L 65,50 L 90,60 L 60,90 L 50,65 L 40,90 L 10,60 L 35,50 L 10,40 Z"/>
+                            </svg>
+                        </div>
+                        <span class="font-bold text-sm text-white">VASCO</span>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-white tracking-widest bg-vasco-gray px-4 py-1 rounded-lg border border-gray-700">
+                            2 - 1
+                        </div>
+                        <span class="text-xs text-vasco-red font-bold mt-2 block animate-pulse">78' Segundo Tempo</span>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <div class="w-14 h-14 bg-gray-800 rounded-full flex items-center justify-center p-2 border border-gray-700 mb-2">
+                            <i class="fa-solid fa-shield-halved text-gray-300 text-2xl"></i>
+                        </div>
+                        <span class="font-bold text-sm text-white">RIVAL</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-gray-800 text-xs text-gray-400">
+                    ⚽ Gols: <span class="text-white font-semibold">Vegetti 34', Payet 62'</span> (Vasco) | Rival 48'
+                </div>
+            </div>
+
+            <!-- Live Feed Log -->
+            <div class="space-y-3 max-h-48 overflow-y-auto pr-1 text-xs">
+                <div class="bg-vasco-gray/40 p-2.5 rounded border border-gray-800 text-gray-300">
+                    <span class="text-vasco-red font-bold">75'</span> - Faltas duras no meio campo! Torcida canta alto na social de São Januário.
+                </div>
+                <div class="bg-vasco-gray/40 p-2.5 rounded border border-gray-800 text-gray-300">
+                    <span class="text-vasco-red font-bold">62'</span> - <strong class="text-white">GOOOOOOOOOOL DO VASCO!</strong> Grande jogada coletiva finalizada com maestria na rede!
+                </div>
+                <div class="bg-vasco-gray/40 p-2.5 rounded border border-gray-800 text-gray-300">
+                    <span class="text-vasco-red font-bold">48'</span> - Gol do adversário em cobrança de escanteio.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-vasco-dark border-t border-gray-800 text-gray-400 py-10 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="w-8 h-8 bg-black rounded flex items-center justify-center p-1">
+                            <svg viewBox="0 0 100 100" class="w-full h-full text-vasco-red fill-current">
+                                <path d="M 40,10 L 50,35 L 60,10 L 90,40 L 65,50 L 90,60 L 60,90 L 50,65 L 40,90 L 10,60 L 35,50 L 10,40 Z"/>
+                            </svg>
+                        </div>
+                        <span class="text-lg font-black text-white">PORTAL VASCO</span>
+                    </div>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        Portal independente de notícias, cobertura completa, resultados em tempo real e bastidores do Club de Regatas Vasco da Gama.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Links Rápidos</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" onclick="switchTab('noticias')" class="hover:text-vasco-red transition">Últimas Notícias</a></li>
+                        <li><a href="#" onclick="switchTab('jogos')" class="hover:text-vasco-red transition">Próximos Jogos</a></li>
+                        <li><a href="#" onclick="switchTab('tabela')" class="hover:text-vasco-red transition">Classificação do Brasileirão</a></li>
+                        <li><a href="#" onclick="switchTab('elenco')" class="hover:text-vasco-red transition">Elenco Profissional</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Estádio & Sede</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        <strong>São Januário</strong><br>
+                        Rua General Almério de Moura, 131<br>
+                        Vasco da Gama, Rio de Janeiro - RJ
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Redes da Torcida</h4>
+                    <div class="flex space-x-3 text-lg">
+                        <a href="#" class="w-8 h-8 bg-vasco-gray rounded-full flex items-center justify-center text-gray-300 hover:text-white hover:bg-vasco-red transition"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" class="w-8 h-8 bg-vasco-gray rounded-full flex items-center justify-center text-gray-300 hover:text-white hover:bg-vasco-red transition"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="w-8 h-8 bg-vasco-gray rounded-full flex items-center justify-center text-gray-300 hover:text-white hover:bg-vasco-red transition"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-gray-800/80 text-center text-xs text-gray-500">
+                <p>© <span id="current-year">2026</span> Portal Vasco da Gama. Feito com paixão pela história bonita do Gigante da Colina.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ================= DATA STORES =================
+        const newsData = [
+            {
+                id: 1,
+                title: "Vasco acerta detalhes e encaminha contratação de novo camisa 10",
+                category: "mercado",
+                categoryLabel: "Mercado da Bola",
+                date: "Há 1 hora",
+                summary: "A diretoria do Vasco avançou nas negociações com meio-campista sul-americano e contrato deve ser assinado ainda esta semana em São Januário.",
+                image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80",
+                content: `
+                    <p class="mb-4">O Vasco da Gama continua ativo no mercado da bola em busca de reforços para o elenco principal. Nas últimas horas, a diretoria avançou significativamente nas tratativas para contratar um experiente meio-campista sul-americano.</p>
+                    <p class="mb-4">Segundo fontes ligadas ao clube, os termos salariais e tempo de contrato já foram pré-acordados. Faltam apenas exames médicos e a assinatura formal em São Januário.</p>
+                    <p class="mb-4">O atleta chega para suprir a necessidade de criação no setor de meio-campo e já recebeu o aval da comissão técnica.</p>
+                `
+            },
+            {
+                id: 2,
+                title: "São Januário Caldeirão: Ingressos esgotados para o próximo jogo",
+                category: "jogos",
+                categoryLabel: "Jogos",
+                date: "Há 3 horas",
+                summary: "Mais de 20 mil torcedores garantiram presença em poucas horas de venda. Apoio da torcida promete empurrar o Gigante da Colina.",
+                image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=800&q=80",
+                content: `
+                    <p class="mb-4">A torcida vascaína deu mais um show nas bilheterias. Em menos de quatro horas de vendas abertas para os sócios estatutários e torcedores em geral, todos os ingressos para o duelo do fim de semana em São Januário foram comercializados.</p>
+                    <p class="mb-4">O caldeirão vai pulsar novamente. A diretoria orienta que os torcedores cheguem cedo ao estádio para evitar filas nas catracas de acesso.</p>
+                `
+            },
+            {
+                id: 3,
+                title: "Jóia da Base Forte renova vínculo até 2029 com multa milionária",
+                category: "base",
+                categoryLabel: "Base Forte",
+                date: "Há 5 horas",
+                summary: "Destaque da equipe Sub-20 selou novo acordo com o Cruzmaltino. Diretoria protege promessa do assédio de clubes europeus.",
+                image: "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=800&q=80",
+                content: `
+                    <p class="mb-4">A fábrica de talentos de São Januário garantiu o futuro de uma de suas principais promessas. A jovem revelação do Sub-20 assinou extensão contratual válida até o final de 2029.</p>
+                    <p class="mb-4">Para evitar saídas precoces sem compensação financeira adequada, a multa rescisória para clubes do exterior foi fixada em aproximadamente 50 milhões de euros.</p>
+                `
+            },
+            {
+                id: 4,
+                title: "Projeto de Modernização de São Januário avança na Câmara Municipal",
+                category: "clube",
+                categoryLabel: "Institucional",
+                date: "Há 1 dia",
+                summary: "Potencial construtivo do estádio teve nova etapa aprovada. Ampliação da capacidade para 40 mil lugares se aproxima.",
+                image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80",
+                content: `
+                    <p class="mb-4">Um passo histórico para o futuro do Club de Regatas Vasco da Gama. O projeto do potencial construtivo de São Januário teve parecer favorável em votação na Câmara dos Vereadores do Rio de Janeiro.</p>
+                    <p class="mb-4">A meta da diretoria é viabilizar a reforma e ampliação do histórico estádio para comportar cerca de 40.000 torcedores com padrão moderno e preservação da fachada tombada.</p>
+                `
+            },
+            {
+                id: 5,
+                title: "Análise Tática: Como a compactação defensiva mudou o ritmo do Vasco",
+                category: "jogos",
+                categoryLabel: "Análise",
+                date: "Há 1 dia",
+                summary: "Estatísticas mostram queda acentuada nos gols sofridos nas últimas rodadas após mudança no esquema do treinador.",
+                image: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=800&q=80",
+                content: `
+                    <p class="mb-4">A evolução defensiva do Vasco da Gama nos últimos compromissos não aconteceu por acaso. Dados táticos comprovam que o time reduziu em 40% as finalizações concedidas aos adversários dentro da grande área.</p>
+                    <p class="mb-4">Com maior intensidade na primeira linha de combate no meio-campo, a equipe ganha mais estabilidade para transições ofensivas velozes.</p>
+                `
+            },
+            {
+                id: 6,
+                title: "Vasco prepara homenagem aos Camisas Negras na próxima rodada",
+                category: "clube",
+                categoryLabel: "História",
+                date: "Há 2 dias",
+                summary: "Ação especial no uniforme celebrará os 100 anos do título histórico dos Camisas Negras de 1923.",
+                image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=800&q=80",
+                content: `
+                    <p class="mb-4">Pioneiro na luta contra o preconceito no futebol brasileiro, o Vasco prepara um evento memorável em São Januário para recordar os 'Camisas Negras'.</p>
+                    <p class="mb-4">O time entrará em campo com um patch especial gravado no peito e detalhes históricos no uniforme comemorativo.</p>
+                `
+            }
+        ];
+
+        const featuredArticle = {
+            id: 99,
+            title: "Vasco vence clássico no Caldeirão de São Januário com show da torcida",
+            categoryLabel: "Brasileirão",
+            date: "Há 2 horas",
+            image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
+            content: `
+                <p class="mb-4 font-semibold text-lg text-white">Uma noite inesquecível em São Januário! Com golaços e apoio ininterrupto da torcida do início ao fim, o Vasco dominou o clássico e somou três pontos na tabela.</p>
+                <p class="mb-4">A partida começou em ritmo alucinante. Pressionando a saída de bola do rival, o Cruzmaltino abriu o placar aos 18 minutos do primeiro tempo com uma bela finalização da entrada da área.</p>
+                <p class="mb-4">Na etapa final, mesmo após a reação adversária, o Gigante da Colina manteve a postura ofensiva e selou a vitória em grande jogada trabalhada pelo setor de ataque.</p>
+            `
+        };
+
+        const matchesData = [
+            {
+                id: 101,
+                type: "proximo",
+                homeTeam: "Vasco da Gama",
+                awayTeam: "São Paulo",
+                isHome: true,
+                date: "Sábado, 24 de Outubro",
+                time: "18:30",
+                competition: "Brasileirão Série A",
+                stadium: "São Januário (Rio de Janeiro)",
+                scoreHome: null,
+                scoreAway: null
+            },
+            {
+                id: 102,
+                type: "proximo",
+                homeTeam: "Atlético-MG",
+                awayTeam: "Vasco da Gama",
+                isHome: false,
+                date: "Quarta, 28 de Outubro",
+                time: "21:30",
+                competition: "Copa do Brasil",
+                stadium: "Arena MRV (Belo Horizonte)",
+                scoreHome: null,
+                scoreAway: null
+            },
+            {
+                id: 103,
+                type: "proximo",
+                homeTeam: "Vasco da Gama",
+                awayTeam: "Internacional",
+                isHome: true,
+                date: "Domingo, 01 de Novembro",
+                time: "16:00",
+                competition: "Brasileirão Série A",
+                stadium: "São Januário (Rio de Janeiro)",
+                scoreHome: null,
+                scoreAway: null
+            },
+            {
+                id: 104,
+                type: "resultado",
+                homeTeam: "Vasco da Gama",
+                awayTeam: "Flamengo",
+                isHome: true,
+                date: "Domingo Passado",
+                time: "Encerrado",
+                competition: "Brasileirão Série A",
+                stadium: "São Januário",
+                scoreHome: 2,
+                scoreAway: 1,
+                status: "Vitória do Vasco"
+            },
+            {
+                id: 105,
+                type: "resultado",
+                homeTeam: "Botafogo",
+                awayTeam: "Vasco da Gama",
+                isHome: false,
+                date: "12 de Outubro",
+                time: "Encerrado",
+                competition: "Brasileirão Série A",
+                stadium: "Nilton Santos",
+                scoreHome: 0,
+                scoreAway: 1,
+                status: "Vitória do Vasco"
+            },
+            {
+                id: 106,
+                type: "resultado",
+                homeTeam: "Vasco da Gama",
+                awayTeam: "Fluminense",
+                isHome: true,
+                date: "05 de Outubro",
+                time: "Encerrado",
+                competition: "Brasileirão Série A",
+                stadium: "Maracanã",
+                scoreHome: 3,
+                scoreAway: 0,
+                status: "Vitória do Vasco"
+            }
+        ];
+
+        const tableData = [
+            { pos: 1, club: "Botafogo", pts: 56, j: 28, v: 17, e: 5, d: 6, gp: 48, gc: 26, sg: 22 },
+            { pos: 2, club: "Palmeiras", pts: 54, j: 28, v: 16, e: 6, d: 6, gp: 46, gc: 23, sg: 23 },
+            { pos: 3, club: "Fortaleza", pts: 52, j: 28, v: 15, e: 7, d: 6, gp: 39, gc: 28, sg: 11 },
+            { pos: 4, club: "Flamengo", pts: 49, j: 28, v: 14, e: 7, d: 7, gp: 44, gc: 31, sg: 13 },
+            { pos: 5, club: "Vasco da Gama", pts: 46, j: 28, v: 13, e: 7, d: 8, gp: 38, gc: 32, sg: 6, isVasco: true },
+            { pos: 6, club: "São Paulo", pts: 44, j: 28, v: 13, e: 5, d: 10, gp: 35, gc: 30, sg: 5 },
+            { pos: 7, club: "Bahia", pts: 42, j: 28, v: 12, e: 6, d: 10, gp: 37, gc: 34, sg: 3 },
+            { pos: 8, club: "Cruzeiro", pts: 41, j: 28, v: 11, e: 8, d: 9, gp: 33, gc: 31, sg: 2 },
+            { pos: 9, club: "Internacional", pts: 40, j: 28, v: 11, e: 7, d: 10, gp: 32, gc: 30, sg: 2 },
+            { pos: 10, club: "Atlético-MG", pts: 38, j: 28, v: 10, e: 8, d: 10, gp: 36, gc: 38, sg: -2 }
+        ];
+
+        const squadData = [
+            { name: "Léo Jardim", pos: "Goleiro", posCat: "goleiros", num: 1, country: "🇧🇷" },
+            { name: "Keiller", pos: "Goleiro", posCat: "goleiros", num: 13, country: "🇧🇷" },
+            { name: "Léo Pelé", pos: "Zagueiro", posCat: "defensores", num: 3, country: "🇧🇷" },
+            { name: "João Victor", pos: "Zagueiro", posCat: "defensores", num: 4, country: "🇧🇷" },
+            { name: "Maicon", pos: "Zagueiro", posCat: "defensores", num: 18, country: "🇧🇷" },
+            { name: "Lucas Piton", pos: "Lateral Esquerdo", posCat: "defensores", num: 6, country: "🇧🇷" },
+            { name: "Paulo Henrique", pos: "Lateral Direito", posCat: "defensores", num: 96, country: "🇧🇷" },
+            { name: "Hugo Moura", pos: "Volante", posCat: "meias", num: 25, country: "🇧🇷" },
+            { name: "Mateus Carvalho", pos: "Volante", posCat: "meias", num: 85, country: "🇧🇷" },
+            { name: "Dimitri Payet", pos: "Meia-Atacante", posCat: "meias", num: 10, country: "🇫🇷" },
+            { name: "Philippe Coutinho", pos: "Meia-Atacante", posCat: "meias", num: 11, country: "🇧🇷" },
+            { name: "Pablo Vegetti", pos: "Atacante (C-C-Capitão)", posCat: "atacantes", num: 9, country: "🇦🇷" },
+            { name: "Adson", pos: "Atacante", posCat: "atacantes", num: 28, country: "🇧🇷" },
+            { name: "Rayal", pos: "Atacante", posCat: "atacantes", num: 77, country: "🇧🇷" },
+            { name: "David", pos: "Atacante", posCat: "atacantes", num: 7, country: "🇧🇷" }
+        ];
+
+        // ================= RENDER FUNCTIONS =================
+
+        function renderNews(filterCat = 'todos', keyword = '') {
+            const container = document.getElementById('news-grid');
+            container.innerHTML = '';
+
+            let filtered = newsData;
+
+            if (filterCat !== 'todos') {
+                filtered = filtered.filter(item => item.category === filterCat);
+            }
+
+            if (keyword.trim() !== '') {
+                const term = keyword.toLowerCase();
+                filtered = filtered.filter(item => 
+                    item.title.toLowerCase().includes(term) || 
+                    item.summary.toLowerCase().includes(term)
+                );
+            }
+
+            document.getElementById('news-count').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-gray-500 bg-vasco-dark/50 rounded-xl border border-gray-800">
+                        <i class="fa-solid fa-newspaper text-3xl mb-2 text-gray-600"></i>
+                        <p class="text-sm">Nenhuma notícia encontrada para esta busca.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(article => {
+                const card = document.createElement('div');
+                card.className = "bg-vasco-dark border border-gray-800 rounded-xl overflow-hidden shadow-lg hover:border-gray-700 transition flex flex-col group cursor-pointer";
+                card.onclick = () => openArticleModal(article);
+
+                card.innerHTML = `
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${article.image}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <span class="absolute top-3 left-3 bg-vasco-black/80 backdrop-blur-sm text-vasco-red font-bold text-[10px] px-2.5 py-1 rounded uppercase tracking-wider border border-gray-800">
+                            ${article.categoryLabel}
+                        </span>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-base text-white group-hover:text-vasco-red transition line-clamp-2 leading-snug mb-2">
+                                ${article.title}
+                            </h3>
+                            <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed mb-4">
+                                ${article.summary}
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-800/80 text-[11px] text-gray-500">
+                            <span><i class="fa-regular fa-clock mr-1"></i> ${article.date}</span>
+                            <span class="text-vasco-red font-bold flex items-center gap-1 group-hover:translate-x-1 transition">
+                                Ler mais <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderMatches(filterType = 'todos') {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = '';
+
+            let filtered = matchesData;
+            if (filterType === 'proximos') {
+                filtered = matchesData.filter(m => m.type === 'proximo');
+            } else if (filterType === 'resultados') {
+                filtered = matchesData.filter(m => m.type === 'resultado');
+            }
+
+            filtered.forEach(m => {
+                const card = document.createElement('div');
+                card.className = "bg-vasco-black/70 border border-gray-800 rounded-xl p-4 md:p-5 flex flex-col md:flex-row items-center justify-between gap-4 hover:border-gray-700 transition";
+
+                const isResult = m.type === 'resultado';
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <div class="w-2 h-10 ${isResult ? 'bg-vasco-red' : 'bg-gray-600'} rounded-full"></div>
+                        <div>
+                            <span class="text-[10px] uppercase tracking-wider text-vasco-red font-extrabold block">
+                                ${m.competition}
+                            </span>
+                            <span class="text-xs font-semibold text-gray-300">
+                                <i class="fa-regular fa-calendar mr-1"></i> ${m.date} - ${m.time}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Score / Teams -->
+                    <div class="flex items-center justify-center space-x-4 w-full md:w-1/2">
+                        <!-- Home -->
+                        <div class="text-right flex-1 flex items-center justify-end space-x-2">
+                            <span class="font-bold text-sm text-white ${m.homeTeam.includes('Vasco') ? 'text-vasco-red' : ''}">${m.homeTeam}</span>
+                            <div class="w-8 h-8 bg-vasco-dark rounded-full flex items-center justify-center p-1 border border-gray-700 shrink-0">
+                                ${m.homeTeam.includes('Vasco') ? 
+                                    `<svg viewBox="0 0 100 100" class="w-full h-full text-vasco-red fill-current"><path d="M 40,10 L 50,35 L 60,10 L 90,40 L 65,50 L 90,60 L 60,90 L 50,65 L 40,90 L 10,60 L 35,50 L 10,40 Z"/></svg>` 
+                                    : `<i class="fa-solid fa-shield-halved text-gray-400 text-xs"></i>`}
+                            </div>
+                        </div>
+
+                        <!-- Score Box -->
+                        <div class="bg-vasco-gray text-white font-black text-sm px-3 py-1.5 rounded-lg border border-gray-700 whitespace-nowrap min-w-[70px] text-center">
+                            ${isResult ? `${m.scoreHome} - ${m.scoreAway}` : 'VS'}
+                        </div>
+
+                        <!-- Away -->
+                        <div class="text-left flex-1 flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-vasco-dark rounded-full flex items-center justify-center p-1 border border-gray-700 shrink-0">
+                                ${m.awayTeam.includes('Vasco') ? 
+                                    `<svg viewBox="0 0 100 100" class="w-full h-full text-vasco-red fill-current"><path d="M 40,10 L 50,35 L 60,10 L 90,40 L 65,50 L 90,60 L 60,90 L 50,65 L 40,90 L 10,60 L 35,50 L 10,40 Z"/></svg>` 
+                                    : `<i class="fa-solid fa-shield-halved text-gray-400 text-xs"></i>`}
+                            </div>
+                            <span class="font-bold text-sm text-white ${m.awayTeam.includes('Vasco') ? 'text-vasco-red' : ''}">${m.awayTeam}</span>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-gray-400 text-center md:text-right w-full md:w-auto border-t md:border-t-0 pt-2 md:pt-0 border-gray-800">
+                        <span><i class="fa-solid fa-location-dot text-vasco-red mr-1"></i> ${m.stadium}</span>
+                        ${isResult ? `<div class="text-[10px] text-emerald-400 font-bold mt-0.5">${m.status}</div>` : ''}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function renderTables() {
+            // Mini Table Widget
+            const miniBody = document.getElementById('mini-table-body');
+            miniBody.innerHTML = '';
+            tableData.slice(0, 7).forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = row.isVasco ? "bg-vasco-red/20 font-bold text-white border-l-2 border-vasco-red" : "hover:bg-vasco-gray/30";
+                tr.innerHTML = `
+                    <td class="py-2 px-2 text-center text-xs">${row.pos}º</td>
+                    <td class="py-2 px-2 text-xs flex items-center gap-1.5 ${row.isVasco ? 'text-vasco-red font-black' : ''}">
+                        ${row.isVasco ? '✠ ' : ''}${row.club}
+                    </td>
+                    <td class="py-2 px-2 text-center text-xs font-bold">${row.pts}</td>
+                    <td class="py-2 px-2 text-center text-xs text-gray-400">${row.j}</td>
+                `;
+                miniBody.appendChild(tr);
+            });
+
+            // Full Table Section
+            const fullBody = document.getElementById('full-table-body');
+            fullBody.innerHTML = '';
+            tableData.forEach(row => {
+                const tr = document.createElement('tr');
+                let highlightClass = "hover:bg-vasco-gray/40 transition";
+                if (row.isVasco) {
+                    highlightClass = "bg-vasco-red/20 font-bold text-white border-l-4 border-vasco-red";
+                } else if (row.pos <= 6) {
+                    highlightClass += " border-l-2 border-blue-500/40";
+                }
+
+                tr.className = highlightClass;
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-bold text-center">${row.pos}º</td>
+                    <td class="py-3 px-4 font-bold ${row.isVasco ? 'text-vasco-red' : 'text-white'}">
+                        ${row.isVasco ? '✠ Vasco da Gama' : row.club}
+                    </td>
+                    <td class="py-3 px-4 text-center font-black text-white">${row.pts}</td>
+                    <td class="py-3 px-4 text-center">${row.j}</td>
+                    <td class="py-3 px-4 text-center text-emerald-400">${row.v}</td>
+                    <td class="py-3 px-4 text-center text-gray-400">${row.e}</td>
+                    <td class="py-3 px-4 text-center text-rose-400">${row.d}</td>
+                    <td class="py-3 px-4 text-center">${row.gp}</td>
+                    <td class="py-3 px-4 text-center">${row.gc}</td>
+                    <td class="py-3 px-4 text-center font-semibold">${row.sg > 0 ? '+'+row.sg : row.sg}</td>
+                `;
+                fullBody.appendChild(tr);
+            });
+        }
+
+        function renderSquad(filterCat = 'todos') {
+            const container = document.getElementById('squad-grid');
+            container.innerHTML = '';
+
+            let filtered = squadData;
+            if (filterCat !== 'todos') {
+                filtered = squadData.filter(p => p.posCat === filterCat);
+            }
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "bg-vasco-black border border-gray-800 rounded-xl p-4 text-center hover:border-vasco-red transition group";
+
+                card.innerHTML = `
+                    <div class="w-16 h-16 mx-auto bg-vasco-dark rounded-full flex items-center justify-center border-2 border-gray-700 group-hover:border-vasco-red transition mb-3 relative">
+                        <span class="text-xl font-black text-vasco-red">#${p.num}</span>
+                        <span class="absolute -bottom-1 -right-1 text-xs">${p.country}</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-white group-hover:text-vasco-red transition truncate">${p.name}</h4>
+                    <p class="text-[11px] text-gray-400 mt-0.5">${p.pos}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ================= TAB NAVIGATION =================
+
+        function switchTab(tabName) {
+            // Hide all sections
+            document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+            
+            // Show selected section
+            const activeSec = document.getElementById(`section-${tabName}`);
+            if (activeSec) activeSec.classList.remove('hidden');
+
+            // Nav Desktop Styling
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-vasco-gray', 'text-white');
+                btn.classList.add('text-gray-300');
+            });
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-vasco-gray', 'text-white');
+                activeNav.classList.remove('text-gray-300');
+            }
+
+            // Mobile Nav Styling
+            document.querySelectorAll('.mob-btn').forEach(btn => {
+                btn.classList.remove('text-vasco-red', 'font-bold');
+                btn.classList.add('text-gray-400');
+            });
+            const activeMob = document.getElementById(`mob-${tabName}`);
+            if (activeMob) {
+                activeMob.classList.add('text-vasco-red', 'font-bold');
+                activeMob.classList.remove('text-gray-400');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ================= FILTERS & HANDLERS =================
+
+        function filterCategory(cat) {
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-vasco-red', 'text-white');
+                btn.classList.add('bg-vasco-dark', 'text-gray-300');
+            });
+            event.target.classList.add('active', 'bg-vasco-red', 'text-white');
+            event.target.classList.remove('bg-vasco-dark', 'text-gray-300');
+
+            renderNews(cat, document.getElementById('search-input').value);
+        }
+
+        function filterNews() {
+            const query = document.getElementById('search-input').value;
+            renderNews('todos', query);
+        }
+
+        function filterMatches(type) {
+            document.querySelectorAll('.match-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-vasco-red', 'text-white');
+                btn.classList.add('bg-vasco-gray', 'text-gray-300');
+            });
+            event.target.classList.add('active', 'bg-vasco-red', 'text-white');
+            event.target.classList.remove('bg-vasco-gray', 'text-gray-300');
+
+            renderMatches(type);
+        }
+
+        function filterSquad(cat) {
+            document.querySelectorAll('.squad-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-vasco-red', 'text-white');
+                btn.classList.add('bg-vasco-gray', 'text-gray-300');
+            });
+            event.target.classList.add('active', 'bg-vasco-red', 'text-white');
+            event.target.classList.remove('bg-vasco-gray', 'text-gray-300');
+
+            renderSquad(cat);
+        }
+
+        // ================= MODAL CONTROLS =================
+
+        function openArticleModal(article) {
+            const modal = document.getElementById('article-modal');
+            const content = document.getElementById('modal-content');
+
+            content.innerHTML = `
+                <div class="mb-4">
+                    <span class="bg-vasco-red text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                        ${article.categoryLabel || 'Notícia'}
+                    </span>
+                    <span class="text-xs text-gray-400 ml-2"><i class="fa-regular fa-clock mr-1"></i> ${article.date}</span>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-black text-white mb-4 leading-snug">${article.title}</h2>
+                <div class="rounded-xl overflow-hidden mb-6 max-h-80 w-full border border-gray-800">
+                    <img src="${article.image}" class="w-full h-full object-cover">
+                </div>
+                <div class="text-gray-300 text-sm leading-relaxed border-b border-gray-800 pb-6 mb-6">
+                    ${article.content || `<p class="mb-4">${article.summary}</p>`}
+                </div>
+
+                <!-- Comments Section -->
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-vasco-red"></i> Comentários dos Vascaínos
+                    </h3>
+                    <div class="space-y-3 mb-4" id="comments-list">
+                        <div class="bg-vasco-black p-3 rounded-lg border border-gray-800 text-xs">
+                            <span class="font-bold text-vasco-red">Almirante1998:</span>
+                            <p class="text-gray-300 mt-1">São Januário é nossa casa eterna! O sentimento nunca vai parar!</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="comment-input" placeholder="Escreva seu comentário..." class="bg-vasco-black border border-gray-700 rounded-lg py-2 px-3 text-xs text-white flex-1 focus:outline-none focus:border-vasco-red">
+                        <button onclick="addComment()" class="bg-vasco-red hover:bg-red-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition">
+                            Enviar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeArticleModal() {
+            document.getElementById('article-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function addComment() {
+            const input = document.getElementById('comment-input');
+            const list = document.getElementById('comments-list');
+            if (input && input.value.trim() !== '') {
+                const commentBox = document.createElement('div');
+                commentBox.className = "bg-vasco-black p-3 rounded-lg border border-gray-800 text-xs";
+                commentBox.innerHTML = `
+                    <span class="font-bold text-vasco-red">Você:</span>
+                    <p class="text-gray-300 mt-1">${input.value.trim()}</p>
+                `;
+                list.appendChild(commentBox);
+                input.value = '';
+            }
+        }
+
+        function openLiveModal() {
+            document.getElementById('live-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLiveModal() {
+            document.getElementById('live-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function playChantSound() {
+            const btn = document.getElementById('chant-btn');
+            btn.innerHTML = `<i class="fa-solid fa-volume-high animate-bounce"></i> "Cante Comigo, Vasco!"`;
+            setTimeout(() => {
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> Ouvir Cântico da Colina`;
+            }, 4000);
+        }
+
+        // ================= INITIALIZATION =================
+
+        window.onload = function() {
+            // Set current date
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const today = new Date().toLocaleDateString('pt-BR', options);
+            document.getElementById('current-date-display').innerText = today;
+
+            // Render all dynamic sections
+            renderNews();
+            renderMatches();
+            renderTables();
+            renderSquad();
+        };
+    </script>
+</body>
+</html>
